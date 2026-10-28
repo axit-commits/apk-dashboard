@@ -1,0 +1,23 @@
+{
+  "name": "apk-explorer",
+  "productName": "APK Explorer",
+  "version": "0.1.0",
+  "description": "Free, offline desktop app that decompiles an APK and shows its code, resources and animations.",
+  "main": "src/main/main.js",
+  "author": "Jksol Infotech LLP",
+  "license": "MIT",
+  "scripts": {
+    "setup-tools": "node scripts/setup-tools.js",
+    "start": "electron .",
+    "decode": "node scripts/decode-cli.js"
+  },
+  "dependencies": {
+    "fast-xml-parser": "4.5.0",
+    "highlight.js": "11.10.0",
+    "lottie-web": "5.12.2",
+    "three": "0.169.0"
+  },
+  "devDependencies": {
+    "electron": "36.9.5"
+  }
+}

@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>APK Explorer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark" id="brandMark"></span>
+      <div>
+        <div class="brand-name">APK Explorer</div>
+        <div class="brand-sub">Offline decompiler</div>
+      </div>
+    </div>
+    <button id="addBtn" class="btn primary block"></button>
+
+    <nav class="nav" aria-label="Main">
+      <button class="nav-item active" data-view="home" id="navHome"></button>
+      <button class="nav-item" data-view="compare" id="navCompare"></button>
+      <div class="nav-project" id="navProject" hidden>
+        <div class="nav-label">Current app</div>
+        <div class="nav-app" id="navApp"></div>
+        <button class="nav-item" data-view="overview" id="navOverview"></button>
+        <button class="nav-item" data-view="assets" id="navAssets" disabled></button>
+        <button class="nav-item" data-view="code" id="navCode" disabled></button>
+        <button class="nav-item" data-view="audit" id="navAudit" disabled></button>
+        <button class="nav-item" data-view="report" id="navReport" disabled></button>
+      </div>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="offline" id="offlineNote"></div>
+      <button class="icon-btn" id="themeBtn" title="Switch light / dark theme" aria-label="Switch theme"></button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <!-- Home: add an APK + history -->
+    <section id="home" class="view home">
+      <div id="drop" class="hero" tabindex="0" role="button" aria-label="Add an APK">
+        <div class="hero-glow"></div>
+        <div class="hero-icon" id="heroIcon"></div>
+        <h1>Drop an Android app here</h1>
+        <p>APK, XAPK, APKS or APKM. Code, resources, 3D models, animations, textures and audio are extracted on this computer; nothing is uploaded.</p>
+        <div class="hero-actions">
+          <button class="btn primary lg" id="heroAddBtn"></button>
+        </div>
+        <div class="hero-formats"><span>.apk</span><span>.xapk</span><span>.apks</span><span>.apkm</span></div>
+      </div>
+
+      <div class="section-head">
+        <div>
+          <h2>History</h2>
+          <div class="muted small" id="historyCount"></div>
+        </div>
+        <div class="search-box"><span id="historySearchIcon"></span><input id="historySearch" type="search" placeholder="Search history" aria-label="Search history"></div>
+      </div>
+      <div id="historyList" class="history-grid"></div>
+      <p class="notice">Only analyse apps you own or have permission to examine.</p>
+    </section>
+
+    <!-- Compare versions -->
+    <section id="compare" class="view compare" hidden></section>
+
+    <!-- Project -->
+    <section id="project" class="view project" hidden>
+      <header class="project-head">
+        <div class="app-icon xl" id="projIcon"></div>
+        <div class="project-title">
+          <h1 id="projName">Opening…</h1>
+          <div class="muted mono small" id="projPackage"></div>
+          <div class="chips" id="projChips"></div>
+        </div>
+        <div class="project-actions">
+          <button id="cancelBtn" class="btn danger" hidden></button>
+          <button id="compareBtn" class="btn" hidden></button>
+          <button id="folderBtn" class="btn" hidden></button>
+          <button id="exportAllBtn" class="btn" hidden></button>
+        </div>
+      </header>
+
+      <div class="pipeline" id="pipeline">
+        <ol id="stageList" class="stepper"></ol>
+        <div class="pipeline-foot">
+          <div id="summary" class="muted small"></div>
+          <button class="link small" id="pipelineToggle" hidden>Hide details</button>
+        </div>
+      </div>
+
+      <div id="overview" class="pane overview">
+        <div class="placeholder">The overview appears as soon as the manifest is decoded…</div>
+      </div>
+
+      <div id="assets" class="pane assets" hidden>
+        <nav class="cats" id="cats"></nav>
+        <div class="browser">
+          <div class="toolbar">
+            <div class="search-box grow"><span class="sb-icon" id="assetSearchIcon"></span><input id="search" type="search" placeholder="Search assets by name or type" aria-label="Search assets"></div>
+            <select id="typeFilter" aria-label="Filter by type"><option value="">All types</option></select>
+            <select id="statusFilter" aria-label="Filter by status"><option value="">All statuses</option></select>
+            <select id="sort" aria-label="Sort">
+              <option value="name">Name</option>
+              <option value="size">Largest first</option>
+            </select>
+            <label class="check"><input id="previewOnly" type="checkbox"> Previewable</label>
+            <span id="resultCount" class="muted small"></span>
+          </div>
+          <div id="grid" class="grid-cards"></div>
+        </div>
+        <aside class="preview" id="preview">
+          <div class="placeholder">Select an asset to preview it.</div>
+        </aside>
+      </div>
+
+      <div id="code" class="pane code" hidden>
+        <aside class="code-side">
+          <div class="code-tabs" role="tablist">
+            <button data-ct="files" class="active">Files</button>
+            <button data-ct="search">Search</button>
+          </div>
+          <div id="codeFiles" class="code-tree"></div>
+          <div id="codeSearchPane" class="code-search" hidden>
+            <div class="search-box"><span class="sb-icon" id="codeQueryIcon"></span><input id="codeQuery" type="search" placeholder="Search all code and resources" aria-label="Search all code"></div>
+            <div class="code-search-opts">
+              <select id="codeMode" aria-label="Search in"><option value="text">Text</option><option value="file">File names</option></select>
+              <label class="check"><input type="checkbox" id="codeRegex"> Regex</label>
+              <label class="check" title="Match case"><input type="checkbox" id="codeCase"> Aa</label>
+            </div>
+            <div id="codeSearchStatus" class="muted small"></div>
+            <div id="codeResults" class="code-results"></div>
+          </div>
+        </aside>
+        <section class="code-main">
+          <div class="code-path" id="codePath"></div>
+          <div class="code-view" id="codeView"></div>
+        </section>
+      </div>
+
+      <div id="audit" class="pane audit-pane" hidden></div>
+
+      <div id="report" class="pane report" hidden>
+        <div class="report-head">
+          <div id="reportSummary" class="report-summary"></div>
+          <div class="report-actions">
+            <button id="openReportBtn" class="btn small">Open HTML report</button>
+          </div>
+        </div>
+        <div class="toolbar">
+          <div class="search-box grow"><span class="sb-icon" id="reportSearchIcon"></span><input id="reportSearch" type="search" placeholder="Search archive entries by path, format or reason" aria-label="Search entries"></div>
+          <select id="reportStatus" aria-label="Filter by status"><option value="">All statuses</option></select>
+          <select id="reportPackage" aria-label="Filter by package"><option value="">All packages</option></select>
+          <span id="reportCount" class="muted small"></span>
+        </div>
+        <div class="report-table-wrap"><table class="report-table" id="reportTable"></table></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="dropOverlay" class="drop-overlay" hidden><div>Drop to open</div></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

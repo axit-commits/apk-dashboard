@@ -1,0 +1,35 @@
+// Safe bridge between the page and the main process.
+
+const { contextBridge, ipcRenderer, webUtils } = require('electron');
+
+contextBridge.exposeInMainWorld('api', {
+  pickApk: () => ipcRenderer.invoke('pick-apk'),
+  decode: apkPath => ipcRenderer.invoke('decode', apkPath),
+  openWorkspace: sha => ipcRenderer.invoke('open-workspace', sha),
+  historyList: () => ipcRenderer.invoke('history-list'),
+  codeRoots: sha => ipcRenderer.invoke('code-roots', sha),
+  codeList: (sha, root, rel) => ipcRenderer.invoke('code-list', sha, root, rel),
+  codeFile: (sha, root, rel) => ipcRenderer.invoke('code-file', sha, root, rel),
+  codeSearch: (sha, opts) => ipcRenderer.invoke('code-search', sha, opts),
+  codeSearchCancel: id => ipcRenderer.invoke('code-search-cancel', id),
+  onCodeSearch: cb => ipcRenderer.on('code-search', (_e, m) => cb(m)),
+  runAudit: (sha, force) => ipcRenderer.invoke('audit-run', sha, force),
+  compareRun: (a, b, force) => ipcRenderer.invoke('compare-run', a, b, force),
+  compareDiff: (a, b, root, rel) => ipcRenderer.invoke('compare-diff', a, b, root, rel),
+  onCompareProgress: cb => ipcRenderer.on('compare-progress', (_e, m) => cb(m)),
+  historyRemove: (sha, name) => ipcRenderer.invoke('history-remove', sha, name),
+  cancel: () => ipcRenderer.invoke('cancel'),
+  showFolder: dir => ipcRenderer.invoke('show-folder', dir),
+  showItem: rel => ipcRenderer.invoke('show-item', rel),
+  exportFile: rel => ipcRenderer.invoke('export-file', rel),
+  saveBuffer: (name, data) => ipcRenderer.invoke('save-buffer', name, data),
+  openExtracted: sha => ipcRenderer.invoke('open-extracted', sha),
+  openReport: sha => ipcRenderer.invoke('open-report', sha),
+  exportAll: (sha, name) => ipcRenderer.invoke('export-all', sha, name),
+  pathForFile: file => webUtils.getPathForFile(file),
+  onProgress: cb => ipcRenderer.on('progress', (_e, p) => cb(p)),
+  onOverview: cb => ipcRenderer.on('overview', (_e, o) => cb(o)),
+  onAssets: cb => ipcRenderer.on('assets', (_e, sha) => cb(sha)),
+  onReport: cb => ipcRenderer.on('report', (_e, sha) => cb(sha)),
+  onOpenPath: cb => ipcRenderer.on('open-path', (_e, p) => cb(p)),
+});
